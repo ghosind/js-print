@@ -1,8 +1,12 @@
 /**
- * js-print
- * A Javascript print plugin.
+ * js-print-function
+ * A Javascript print plugin (function version).
  * @author Chen Su <ghosind@gmail.com>
  */
+
+var loadingCount = 0;
+var iFrame;
+var iFrameWindow;
 
 /**
  * print specified element.
@@ -10,10 +14,32 @@
  */
 var print = function(options) {
     var iFrame;
-    var iFrameWindow;
-    var loadingCount = 0;
-
     try {
+        if (!options || !options.elementName || typeof(options.elementName) !== 'string') {
+            throw new Error('parameter is invalid');
+        }
+
+        // get element node
+        var elements;
+        var element;
+        var isMultiple = true;
+
+        if (options.elementName[0] === '.') {
+            elements = document.getElementsByClassName(options.elementName.substring(1));
+        } else if (options.elementName[0] === '#') {
+            element = document.getElementById(options.elementName.substring(1));
+            isMultiple = false;
+        } else {
+            elements = document.getElementsByTagName(options.elementName);
+        }
+
+        if ((isMultiple && (!elements || elements.length === 0)) || 
+            (!isMultiple && !element)) {
+            throw new Error("can't find the element");
+        }
+
+        element = isMultiple ? elements[0] : element;
+
         // create new iframe
         iFrame = document.createElement('iframe');
 
@@ -21,12 +47,12 @@ var print = function(options) {
         document.body.appendChild(iFrame);
 
         // add print contents into iframe
-        iFrame.contentDocument.body.appendChild(this.cloneNode(true));
+        iFrame.contentDocument.body.appendChild(element.cloneNode(true));
 
         // get iframe's contentWindow
         iFrameWindow = iFrame.contentWindow;
 
-        if (options && options.importCss) {
+        if (options.importCss) {
             // clear loading count
             loadingCount = 0;
 
@@ -78,5 +104,3 @@ var print = function(options) {
         throw error;
     }
 }
-
-Element.prototype.print = print;
