@@ -43,6 +43,11 @@ var print = function(options) {
         // create new iframe
         iFrame = document.createElement('iframe');
 
+        // hide iframe
+        iFrame.style.width = 0;
+        iFrame.style.height = 0;
+        iFrame.style.border = 0;
+
         // add iframe into body
         document.body.appendChild(iFrame);
 
